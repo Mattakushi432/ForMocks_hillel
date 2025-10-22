@@ -15,9 +15,11 @@ FAKE_PIKACHU_DATA: Dict[str, Any] = {
     ]
 }
 
+
 @pytest.fixture
 def pokemon_service() -> PokemonService:
     return PokemonService()
+
 
 def test_get_pokemon_info_success(mocker: MockerFixture, pokemon_service: PokemonService):
     mack_get = mocker.patch("pokemon_service.requests.get")
@@ -35,6 +37,7 @@ def test_get_pokemon_info_success(mocker: MockerFixture, pokemon_service: Pokemo
         timeout=10
     )
 
+
 def test_get_pokemon_info_not_found(mocker: MockerFixture, pokemon_service: PokemonService):
     mack_get = mocker.patch("pokemon_service.requests.get")
 
@@ -47,6 +50,7 @@ def test_get_pokemon_info_not_found(mocker: MockerFixture, pokemon_service: Poke
     assert result is None
     mack_get.assert_called_once()
 
+
 def test_get_pokemon_info_network_error(mocker: MockerFixture, pokemon_service: PokemonService):
     mock_get = mocker.patch(
         "pokemon_service.requests.get",
@@ -57,6 +61,7 @@ def test_get_pokemon_info_network_error(mocker: MockerFixture, pokemon_service: 
 
     assert result is None
     mock_get.assert_called_once()
+
 
 def test_get_pokemon_info_empty_name(mocker: MockerFixture, pokemon_service: PokemonService):
     result = pokemon_service.get_pokemon_info("")

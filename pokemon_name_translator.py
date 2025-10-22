@@ -7,8 +7,9 @@ class PokemonNameTranslator:
         """Initialize with an injected client and GCP project id.
 
         Parameters:
-            client: An object providing two methods used by tests:
-                - translate(parent=..., contents=[...], target_language=..., mime_type="text/plain")
+            client: An object providing methods used by tests:
+                - location_path(project, location)
+                - translate_text(parent=..., contents=[...], target_language=..., mime_type="text/plain")
                 - translate_response() -> object with attribute `translations`,
                   which is a list of items each having attribute `translate_text`.
             project (str): GCP project id used to build the parent path.
@@ -17,10 +18,12 @@ class PokemonNameTranslator:
         self.project = project
 
     def translate(self, text: str, target_language: str = "en"):
-        parent = f"projects/{self.project}/locations/global"
         try:
+            # Build the parent path using the provided client helper
+            parent = self.client.location_path(self.project, "global")
+
             # Fire the translate request (the tests assert this exact call/signature)
-            self.client.translate(
+            self.client.translate_text(
                 parent=parent,
                 contents=[text],
                 target_language=target_language,
