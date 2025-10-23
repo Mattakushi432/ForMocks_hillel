@@ -1,41 +1,41 @@
 # pokemon_report.py
 import pdfkit
-import os
-config = pdfkit.configuration(wkhtmltopdf=os.path.abspath(os.path.join("wkhtmltox", "bin","wkhtmltopdf.exe")))
+from typing import Any, Dict
+
 
 class PokemonReport:
-    def generate_report(self, pokemon_info, translated_name, output_pdf):
-        # Create an HTML report
-        html_report = self.create_html_report(pokemon_info, translated_name)
+    def __init__(self, pdfkit_config=None) -> None:
+        # store pdfkit configuration (can be None and will be passed through)
+        self.pdfkit_config = pdfkit_config
 
-        # Convert HTML to PDF
-        pdfkit.from_file(html_report, output_pdf, configuration=config)
+    def generate_report(self, pokemon_info: Dict[str, Any], translated_name: str, output_pdf: str) -> bool:
+        """Generate a PDF report from provided pokemon info.
+        Returns True on success, False if PDF generation fails.
+        """
+        try:
+            html_report = self.create_html_report(pokemon_info, translated_name)
+            pdfkit.from_string(html_report, output_pdf, configuration=self.pdfkit_config)
+            return True
+        except Exception:
+            return False
 
-    def create_html_report(self, pokemon_info, translated_name):
+    def create_html_report(self, pokemon_info: Dict[str, Any], translated_name: str) -> str:
         # Format abilities as a comma-separated list
         abilities = ", ".join(ability["ability"]["name"] for ability in pokemon_info["abilities"])
 
-        html_template = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Pokemon Report</title>
-        </head>
-        <body>
-            <h1>Pokemon Report</h1>
-            <p><strong>Name:</strong> {translated_name}</p>
-            <p><strong>Height:</strong> {pokemon_info['height']} decimetres</p>
-            <p><strong>Weight:</strong> {pokemon_info['weight']} hectograms</p>
-            <p><strong>Abilities:</strong> {abilities}</p>
-        </body>
-        </html>
-        """
-
-        # Create HTML report by substituting values into the template
-        html_report = html_template.format(translated_name=translated_name, pokemon_info=pokemon_info, abilities=abilities)
-
-        # Save the HTML report to a file
-        with open("report_template.html", "w", encoding="utf-8") as f:
-            f.write(html_report)
-
-        return "report_template.html"
+        html = (
+            "<!DOCTYPE html>\n"
+            "<html>\n"
+            "<head>\n"
+            "    <title>Pokemon Report</title>\n"
+            "</head>\n"
+            "<body>\n"
+            "    <h1>Pokemon Report</h1>\n"
+            f"    <p><strong>Name:</strong> {translated_name}</p>\n"
+            f"    <p><strong>Height:</strong> {pokemon_info['height']} decimet</p>\n"
+            f"    <p><strong>Weight:</strong> {pokemon_info['weight']} hectograms</p>\n"
+            f"    <p><strong>Abilities:</strong> {abilities}</p>\n"
+            "</body>\n"
+            "</html>\n"
+        )
+        return html
